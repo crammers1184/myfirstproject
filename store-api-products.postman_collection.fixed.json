@@ -1,0 +1,472 @@
+{
+  "info": {
+    "name": "Store API - Products",
+    "description": "Separate Products collection. Start with read requests, then create, update, patch, and delete the generated product. Request order is preserved. Generated test records are fake API examples; writes are simulated and do not persist in the service.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://fakestoreapi.com",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "product_limit",
+      "value": "12",
+      "type": "string"
+    },
+    {
+      "key": "sort",
+      "value": "asc",
+      "type": "string"
+    },
+    {
+      "key": "category",
+      "value": "electronics",
+      "type": "string"
+    },
+    {
+      "key": "title",
+      "value": "QA Sample Product",
+      "type": "string"
+    },
+    {
+      "key": "updated_title",
+      "value": "QA Updated Product",
+      "type": "string"
+    },
+    {
+      "key": "patched_title",
+      "value": "QA Patched Product",
+      "type": "string"
+    },
+    {
+      "key": "price",
+      "value": "29.99",
+      "type": "string"
+    },
+    {
+      "key": "description",
+      "value": "Synthetic product created by the Postman collection.",
+      "type": "string"
+    },
+    {
+      "key": "image",
+      "value": "https://i.pravatar.cc",
+      "type": "string"
+    },
+    {
+      "key": "created_product_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "[TC001] Get Single Product",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/{{product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "{{product_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty object\", function () { pm.expect(pm.response.json()).to.be.an(\"object\").and.not.empty; });",
+              "pm.test(\"Product ID matches request\", function () { pm.expect(String(pm.response.json().id)).to.eql(String(pm.collectionVariables.get(\"product_id\"))); });",
+              "pm.test(\"Product has core fields\", function () { [\"title\",\"price\",\"description\",\"category\"].forEach(k=>pm.expect(pm.response.json()).to.have.property(k)); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC002] Get All Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").and.not.empty; });",
+              "pm.test(\"Products have expected fields\", function () { pm.response.json().forEach(p=>{pm.expect(p).to.have.property(\"id\");pm.expect(p.title).to.be.a(\"string\");pm.expect(p.price).to.be.a(\"number\");}); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC003] Get Limited Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products?limit={{product_limit}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "{{product_limit}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").and.not.empty; });",
+              "pm.test(\"Returned count matches limit\", function () { pm.expect(pm.response.json().length).to.eql(Number(pm.collectionVariables.get(\"product_limit\"))); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC004] Get Sorted Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products?sort={{sort}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "{{sort}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").and.not.empty; });",
+              "pm.test(\"IDs follow requested sort\", function () { let ids=pm.response.json().map(x=>Number(x.id));let sorted=[...ids].sort((a,b)=>pm.collectionVariables.get(\"sort\")===\"desc\"?b-a:a-b);pm.expect(ids).to.eql(sorted); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC005] Get Products with Limit and Sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products?limit={{product_limit}}&sort={{sort}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "{{product_limit}}"
+            },
+            {
+              "key": "sort",
+              "value": "{{sort}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").and.not.empty; });",
+              "pm.test(\"Count matches limit and IDs follow sort\", function () { let a=pm.response.json(),ids=a.map(x=>Number(x.id)),sorted=[...ids].sort((x,y)=>pm.collectionVariables.get(\"sort\")===\"desc\"?y-x:x-y);pm.expect(a.length).to.eql(Number(pm.collectionVariables.get(\"product_limit\")));pm.expect(ids).to.eql(sorted); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC006] Get All Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/categories",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "categories"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").and.not.empty; });",
+              "pm.test(\"Categories are strings\", function () { pm.response.json().forEach(c=>pm.expect(c).to.be.a(\"string\").and.not.empty); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC007] Get Products by Category",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/category/{{category}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "category",
+            "{{category}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").and.not.empty; });",
+              "pm.test(\"Every product belongs to requested category\", function () { pm.response.json().forEach(p=>pm.expect(p.category.toLowerCase()).to.eql(pm.collectionVariables.get(\"category\").toLowerCase())); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC008] Add a Product",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"{{title}}\",\n  \"price\": {{price}},\n  \"description\": \"{{description}}\",\n  \"image\": \"{{image}}\",\n  \"category\": \"{{category}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty object\", function () { pm.expect(pm.response.json()).to.be.an(\"object\").and.not.empty; });",
+              "pm.test(\"Returned product matches request and ID is saved\", function () { let d=pm.response.json();pm.expect(d.title).to.eql(pm.collectionVariables.get(\"title\"));pm.expect(Number(d.price)).to.eql(Number(pm.collectionVariables.get(\"price\")));pm.expect(d.category).to.eql(pm.collectionVariables.get(\"category\"));pm.expect(d).to.have.property(\"id\");pm.collectionVariables.set(\"created_product_id\",d.id); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC009] Update a Product",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/products/{{created_product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "{{created_product_id}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"{{updated_title}}\",\n  \"price\": {{price}},\n  \"description\": \"{{description}}\",\n  \"image\": \"{{image}}\",\n  \"category\": \"{{category}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty object\", function () { pm.expect(pm.response.json()).to.be.an(\"object\").and.not.empty; });",
+              "pm.test(\"Updated product matches values\", function () { let d=pm.response.json();pm.expect(String(d.id)).to.eql(String(pm.collectionVariables.get(\"created_product_id\")));pm.expect(d.title).to.eql(pm.collectionVariables.get(\"updated_title\"));pm.expect(Number(d.price)).to.eql(Number(pm.collectionVariables.get(\"price\"))); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC010] Partial Update a Product",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/products/{{created_product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "{{created_product_id}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"{{patched_title}}\",\n  \"description\": \"{{description}}\",\n  \"image\": \"{{image}}\",\n  \"category\": \"{{category}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is valid JSON\", function () { pm.expect(()=>pm.response.json()).not.to.throw(); });",
+              "pm.test(\"Response is a non-empty object\", function () { pm.expect(pm.response.json()).to.be.an(\"object\").and.not.empty; });",
+              "pm.test(\"Patched product has requested fields\", function () { let d=pm.response.json();pm.expect(String(d.id)).to.eql(String(pm.collectionVariables.get(\"created_product_id\")));pm.expect(d.title).to.eql(pm.collectionVariables.get(\"patched_title\"));pm.expect(d.category).to.eql(pm.collectionVariables.get(\"category\")); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "[TC011] Delete a Product",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/{{created_product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "{{created_product_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200 or 204\", function () { pm.expect([200, 204]).to.include(pm.response.code); });",
+              "pm.test(\"Delete response is empty or valid JSON\", function () { const body=pm.response.text(); if(body.trim().length){ pm.expect(()=>pm.response.json()).not.to.throw(); } });",
+              "pm.test(\"Returned deleted product ID matches requested ID when present\", function () { const body=pm.response.text(); if(body.trim().length){ const data=pm.response.json(); pm.expect(data).to.be.an(\"object\"); if(data.id!==undefined){ pm.expect(String(data.id)).to.eql(String(pm.collectionVariables.get(\"created_product_id\"))); } } });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
